@@ -1,7 +1,7 @@
 [build]
   base = "/"
   publish = "frontend"
-  functions = "backend"  # Make sure your functions are in the 'backend' folder
+  functions = "backend/functions"  # Make sure your functions are in the 'backend' folder
   command = "echo 'No build step required for frontend'"
 
 [[redirects]]
