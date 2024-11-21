@@ -1,10 +1,10 @@
 [build]
   base = "/"
   publish = "frontend"
-  functions = "backend"
+  functions = "backend"  # Make sure your functions are in the 'backend' folder
   command = "echo 'No build step required for frontend'"
 
 [[redirects]]
   from = "/get-data"
-  to = "/.netlify/functions/get_data"
+  to = "/.netlify/functions/get-data"
   status = 200
