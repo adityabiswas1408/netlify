@@ -1,0 +1,35 @@
+import json
+import pandas as pd
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)
+
+# Load the Excel data (make sure it's in the correct directory)
+data = pd.read_excel('./backend/functions/VOTE.xlsx')
+
+@app.route("/get-data", methods=["POST"])
+def get_data():
+    user_input = request.json.get('query', '').strip()
+
+    data['HRMS'] = data['HRMS'].astype(str)
+    data['IPAS'] = data['IPAS'].astype(str)
+
+    if user_input.isdigit():
+        result = data[data['HRMS'] == user_input]
+    else:
+        result = data[data['IPAS'] == user_input]
+
+    if result.empty:
+        return jsonify({"message": "No data found"}), 200
+
+    return jsonify(result.to_dict(orient='records')), 200
+
+# Netlify Function entry point
+def handler(event, context):
+    with app.test_request_context():
+        # Wrap the Flask app's request handling inside Netlify's Lambda context
+        return app.full_dispatch_request()
+
