@@ -1,0 +1,8 @@
+[build]
+  functions = "backend/functions"  # Directory for your functions
+  publish = "frontend"              # Directory for your static frontend
+
+[[redirects]]
+  from = "/get-data"
+  to = "/.netlify/functions/get-data"
+  status = 200
