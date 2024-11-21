@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Details</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #7fa294, #9db8ab 40%, #b3c7b3 100%);
+            color: #000;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 2.8em;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 40px;
+        }
+
+        .input-section {
+            flex: 1;
+            max-width: 400px;
+            margin-right: 20px;
+            text-align: center;
+        }
+
+        .input-section h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            font-size: 1.3em;
+            padding: 12px;
+            width: 90%;
+            border: 2px solid #000;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        button {
+            margin-top: 15px;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #444;
+        }
+
+        .details-section {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .details-table {
+            width: 100%;
+            border: 2px solid #000;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        .details-table th {
+            background-color: #ffeb3b;
+            font-size: 1.3em;
+            text-align: left;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+
+        .details-table td {
+            font-size: 1.2em;
+            text-align: left;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+
+        .highlight {
+            background-color: #ffff00;
+        }
+
+        .generate-slip {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .generate-slip:hover {
+            color: #007acc;
+        }
+
+        .no-records {
+            font-size: 1.5em;
+            color: #ff0000;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        // Function to handle fetching data
+        async function fetchData() {
+            const userInput = document.getElementById('userInput').value;
+            if (!userInput) {
+                alert("Please enter a value.");
+                return;
+            }
+
+            // Convert the user input to uppercase before sending it to the backend
+            const userInputUpper = userInput.toUpperCase();
+
+            try {
+                // Send a POST request to the Netlify function endpoint
+                const response = await fetch('/.netlify/functions/get-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: userInputUpper })
+                });
+
+                const result = await response.json();
+
+                // Check if data is found
+                if (response.ok && result && result.length > 0) {
+                    updateTable(result[0]);
+                    document.getElementById('no-records').style.display = 'none'; // Hide the "No records found" message
+                    document.querySelector('.details-section').style.display = 'block'; // Show the details table
+                } else {
+                    document.getElementById('no-records').style.display = 'block'; // Show the "No records found" message
+                    document.querySelector('.details-section').style.display = 'none'; // Hide the details table
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Automatically convert input to uppercase while typing
+        function toUpperCaseInput() {
+            const userInputField = document.getElementById('userInput');
+            userInputField.value = userInputField.value.toUpperCase();
+        }
+
+        // Function to update the table with fetched data
+        function updateTable(data) {
+            document.getElementById('ipas').innerText = data.IPAS || "";
+            document.getElementById('hrms').innerText = data.HRMS || "";
+            document.getElementById('name').innerText = data.NAME || "";
+            document.getElementById('designation').innerText = data.DESIGNATION || "";
+            document.getElementById('working').innerText = data["WORKING UNDER"] || "";
+            document.getElementById('station').innerText = data.STATION || "";
+            document.getElementById('uvin').innerText = data.UVIN || "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Voter Details</h1>
+    <div class="container">
+        <!-- Input Section -->
+        <div class="input-section">
+            <h3>Enter IPAS Number OR HRMS ID:</h3>
+            <input type="text" id="userInput" placeholder="Enter here" oninput="toUpperCaseInput()">
+            <br>
+            <button onclick="fetchData()">Click To Fetch Your Details</button>
+        </div>
+        <!-- Details Section -->
+        <div class="details-section" style="display: none;">
+            <table class="details-table">
+                <tr>
+                    <th colspan="2">Voter Details</th>
+                </tr>
+                <tr>
+                    <td>IPAS Number</td>
+                    <td id="ipas"></td>
+                </tr>
+                <tr>
+                    <td>HRMS ID</td>
+                    <td id="hrms"></td>
+                </tr>
+                <tr>
+                    <td>NAME</td>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <td>DESIGNATION</td>
+                    <td id="designation"></td>
+                </tr>
+                <tr>
+                    <td>WORKING UNDER</td>
+                    <td id="working"></td>
+                </tr>
+                <tr>
+                    <td>STATION</td>
+                    <td id="station"></td>
+                </tr>
+                <tr>
+                    <td>Unique Voter Identity Number (UVIN)</td>
+                    <td id="uvin" class="highlight"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="no-records" class="no-records" style="display: none;">
+        No records found.
+    </div>
+</body>
+</html>
